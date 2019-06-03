@@ -12,7 +12,7 @@ print("Azure ML SDK Version: ", azureml.core.VERSION)
 # Define Vars < Change the vars>. 
 # In a production situation, don't put secrets in source code, but as secret variables, 
 # see https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#secret-variables
-workspace="3_IncomeNotebookDevops"
+workspace="wsml1"
 subscription_id="b8ccc607-226a-4694-93b2-cce97d283eed"
 resource_grp="mlrg1"
 
