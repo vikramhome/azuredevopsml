@@ -48,22 +48,52 @@ from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 # COMMAND ----------
 
 # Download AdultCensusIncome.csv from Azure CDN. This file has 32,561 rows.
-basedataurl = "https://amldockerdatasets.azureedge.net"
-datafile = "AdultCensusIncome.csv"
-datafile_dbfs = os.path.join("/dbfs", datafile)
+# commented below code for azure ml
+#basedataurl = "https://amldockerdatasets.azureedge.net"
+#datafile = "AdultCensusIncome.csv"
+#datafile_dbfs = os.path.join("/dbfs", datafile)
 
-if os.path.isfile(datafile_dbfs):
-    print("found {} at {}".format(datafile, datafile_dbfs))
-else:
-    print("downloading {} to {}".format(datafile, datafile_dbfs))
-    urllib.request.urlretrieve(os.path.join(basedataurl, datafile), datafile_dbfs)
-    time.sleep(30)
+#if os.path.isfile(datafile_dbfs):
+#    print("found {} at {}".format(datafile, datafile_dbfs))
+#else:
+#    print("downloading {} to {}".format(datafile, datafile_dbfs))
+#    urllib.request.urlretrieve(os.path.join(basedataurl, datafile), datafile_dbfs)
+#    time.sleep(30)
 
 # COMMAND ----------
 
 # Create a Spark dataframe out of the csv file.
-data_all = sqlContext.read.format('csv').options(header='true', inferSchema='true', ignoreLeadingWhiteSpace='true', ignoreTrailingWhiteSpace='true').load(datafile)
-print("({}, {})".format(data_all.count(), len(data_all.columns)))
+#data_all = sqlContext.read.format('csv').options(header='true', inferSchema='true', ignoreLeadingWhiteSpace='true', ignoreTrailingWhiteSpace='true').load(datafile)
+#print("({}, {})".format(data_all.count(), len(data_all.columns)))
+
+# this is where old code commented out ends.
+
+# inserted new code to get data from db
+
+jdbcHostname = "40.85.172.154"
+jdbcPort = "1433"
+jdbcDatabase = "databaseab1"
+jdbcUsername = "mladmin"
+jdbcPassword = "Satyam@12345"
+
+#// Create the JDBC URL without passing in the user and password parameters.
+#jdbcUrl = s"jdbc:sqlserver://${jdbcHostname}:${jdbcPort};database=${jdbcDatabase}"
+
+#// Create a Properties() object to hold the parameters.
+
+driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+#url = "jdbc:sqlserver://"+jdbcHostname+":"+jdbcPort+";database="+jdbcDatabase,
+url = "jdbc:sqlserver://"+jdbcHostname+":"+jdbcPort+";databaseName="+jdbcDatabase+";user="+jdbcUsername+";password="+jdbcPassword
+
+table = "AdultCensusIncome"
+
+
+data_all = spark.read.format("jdbc")\
+  .option("driver", driver)\
+  .option("url", url)\
+  .option("dbtable", table)\
+  .load()
+# This is where new code ends for DB tables
 
 #renaming columns, all columns that contain a - will be replaced with an "_"
 columns_new = [col.replace("-", "_") for col in data_all.columns]
